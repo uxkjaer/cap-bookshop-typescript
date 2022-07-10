@@ -2,6 +2,10 @@ import "reflect-metadata";
 import express from "express";
 import { createCombinedHandler } from "cds-routing-handlers";
 import cds from "@sap/cds";
+import { Database } from "bun:sqlite";
+
+const db = new Database("mydb.sqlite");
+
 
 export class Server {
     public static async run() {
@@ -11,7 +15,7 @@ export class Server {
             handler: [__dirname + "/entities/**/*.js", __dirname + "/functions/**/*.js"],
         });
 
-        await cds.connect("db");
+        await cds.connect("mydb.sqlite");
         await cds
             .serve("all")
             .at("odata")
@@ -19,7 +23,7 @@ export class Server {
             .with(srv => hdl(srv));
 
         // Redirect requests to the OData Service
-        app.get('/', function(req, res) {
+        app.get('/', function (req, res) {
             res.redirect('/odata/')
         })
 
